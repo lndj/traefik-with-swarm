@@ -1,13 +1,13 @@
-<p align="center">
-# Traefix Proxy With Docker Swarm
-</p>
+<h1 align="center">
+Traefix Proxy With Docker Swarm
+</h1>
 
 A traefik demo with docker swarm for little / personal project.
 
 # Feature
 
 1. Auto https With Let's encrypt.
-2. Auto loadbalance.
+2. Auto load balance.
 
 # Getting started
 
