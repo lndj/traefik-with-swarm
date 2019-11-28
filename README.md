@@ -2,7 +2,7 @@
 Traefix Proxy With Docker Swarm
 </h1>
 
-A traefik demo with docker swarm for little / personal project.
+A traefik demo with docker swarm for little / personal project (You don't need k8s).
 
 # Feature
 
