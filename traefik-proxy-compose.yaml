@@ -50,8 +50,10 @@ services:
         - "traefik.http.routers.traefik.entrypoints=websecure"
         - "traefik.http.routers.traefik.middlewares=authtraefik"
         - "traefik.http.routers.traefik.tls.certresolver=letsencryptresolver"
+        # You must use $$ to relpace $ in password
+        # You should Use cli: echo $(htpasswd -nb user yourpassword) | sed -e s/\\$/\\$\\$/g
         - "traefik.http.middlewares.authtraefik.basicauth.users=user:$$apr1$$CV5g.1HA$$2n2ofRew5EvnK5sAg.Yzs0"
-        # echo $(htpasswd -nb user yourpassword) | sed -e s/\\$/\\$\\$/g
+      
 volumes:
   traefik-certificates:
 networks:

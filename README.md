@@ -8,6 +8,7 @@ A traefik demo with docker swarm for little / personal project.
 
 1. Auto https With Let's encrypt.
 2. Auto load balance.
+3. Proxy dashboard.
 
 # Getting started
 
@@ -30,4 +31,12 @@ docker stack  deploy -c traefik-proxy-compose.yml traefik-proxy
 
 ```shell
 docker stack  deploy -c service-compose.yml my-service
+```
+
+# Remark
+
+When use traefik dashboard with http basic auth, use this command generate password:
+
+```shell
+echo $(htpasswd -nb user yourpassword) | sed -e s/\\$/\\$\\$/g
 ```
