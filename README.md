@@ -16,7 +16,7 @@ A traefik demo with docker swarm for little / personal project.
 ```shell
 docker network create -d overlay proxy-net
 ```
-More info: (Docker network doc)[https://docs.docker.com/engine/reference/commandline/network_create/]
+More info: [Docker document](https://docs.docker.com/engine/reference/commandline/network_create/)
 
 2. Create traefik stack
 
