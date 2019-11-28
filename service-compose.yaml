@@ -1,0 +1,16 @@
+version: '3'
+services:
+  helloworld:
+    image: tutum/hello-world:latest
+    networks:
+     - proxy-net
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.helloworld.rule=Host(`helloworld.local`)"
+        - "traefik.http.routers.helloworld.entrypoints=websecure"
+        - "traefik.http.routers.helloworld.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.helloworld.loadbalancer.server.port=80"
+networks:
+  proxy-net:
+    external: true

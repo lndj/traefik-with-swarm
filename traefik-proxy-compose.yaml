@@ -1,0 +1,59 @@
+version: "3.4"
+
+services:
+  reverse-proxy:
+    image: traefik:v2.0.5
+    command:
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=proxy-net"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencryptresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencryptresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencryptresolver.acme.email=your@mail.com"
+      - "--certificatesresolvers.letsencryptresolver.acme.storage=/letsencrypt/acme.json"
+      - "--accesslog=true"
+      - "--api"
+      - "--log.level=DEBUG"
+      # Use letsencrypt staging env  使用 letsencrypt 的测试环境
+      - "--certificatesresolvers.letsencryptresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      # To persist certificates
+      - traefik-certificates:/letsencrypt
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - proxy-net
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)"
+        # - "traefik.http.routers.http-catchall.rule=HostRegexp(`lndj.com`, `{subdomain:[a-z]+}.lndj.com`)"
+        - "traefik.http.routers.http-catchall.entrypoints=web"
+        - "traefik.http.routers.http-catchall.middlewares=redirect-to-https@docker"
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+        # Dashboard
+        # 这里是个坑 https://docs.traefik.io/operations/api/  docker swarm模式下，需要一个随意的端口配置在这里，才可以启用dashboard
+        # Dummy service for Swarm port detection. The port can be any valid integer value. 
+        - "traefik.http.services.traefik.loadbalancer.server.port=80"
+        - "traefik.http.routers.traefik.rule=Host(`traefik.lndj.com`)"
+        - "traefik.http.routers.traefik.service=api@internal"
+        - "traefik.http.routers.traefik.entrypoints=websecure"
+        - "traefik.http.routers.traefik.middlewares=authtraefik"
+        - "traefik.http.routers.traefik.tls.certresolver=letsencryptresolver"
+        - "traefik.http.middlewares.authtraefik.basicauth.users=user:$$apr1$$CV5g.1HA$$2n2ofRew5EvnK5sAg.Yzs0"
+        # echo $(htpasswd -nb user yourpassword) | sed -e s/\\$/\\$\\$/g
+volumes:
+  traefik-certificates:
+networks:
+  proxy-net:
+    external: true
