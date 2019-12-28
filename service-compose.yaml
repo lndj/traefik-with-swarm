@@ -9,8 +9,13 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.helloworld.rule=Host(`helloworld.local`)"
         - "traefik.http.routers.helloworld.entrypoints=websecure"
+        -  "traefik.http.services.helloworld.tl=true"
         - "traefik.http.routers.helloworld.tls.certresolver=letsencryptresolver"
         - "traefik.http.services.helloworld.loadbalancer.server.port=80"
+        # A certificate for the domains helloworld.local (main) and *.helloworld.local (SAN) is requested 
+        - "traefik.http.services.helloworld.tls.domains[0].main=helloworld.local"
+        - "traefik.http.services.helloworld.tls.domains[1].sans=*.helloworld.local"
+        
 networks:
   proxy-net:
     external: true
